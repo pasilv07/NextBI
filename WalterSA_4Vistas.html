@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Walter S.A. — 4 Vistas</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f5f4f0;--bg2:#ffffff;--bg3:#eeecea;
+  --text:#1a1a18;--text2:#6b6a66;--text3:#a8a7a3;
+  --border:#dddcd8;--border2:#c8c7c2;
+  --blue:#1d4ed8;--blue-bg:#eff6ff;
+  --green:#15803d;--green-bg:#f0fdf4;
+  --red:#b91c1c;--red-bg:#fef2f2;
+  --amber:#b45309;--amber-bg:#fffbeb;
+}
+body{background:var(--bg);color:var(--text);font-family:'IBM Plex Sans',sans-serif;font-size:13px;min-height:100vh}
+.header{background:var(--bg2);border-bottom:1px solid var(--border);padding:12px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.header-left{display:flex;align-items:center;gap:12px}
+.logo{width:30px;height:30px;background:var(--text);border-radius:6px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:600;font-size:12px}
+.h-title{font-size:14px;font-weight:600}
+.h-sub{font-size:11px;color:var(--text3);margin-top:1px}
+.nav{display:flex;gap:2px;background:var(--bg3);border-radius:8px;padding:3px}
+.nav-btn{padding:5px 13px;border-radius:5px;border:none;background:transparent;color:var(--text2);font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;transition:all .15s;white-space:nowrap}
+.nav-btn.active{background:var(--bg2);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+
+/* FILTER BAR */
+.filter-bar{background:var(--bg2);border-bottom:1px solid var(--border);padding:10px 24px;display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+.filter-group{display:flex;align-items:center;gap:8px}
+.filter-label{font-size:11px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;white-space:nowrap}
+.filter-pills{display:flex;gap:4px}
+.pill{padding:4px 12px;border-radius:16px;border:1px solid var(--border);background:transparent;color:var(--text2);font-size:11px;font-weight:500;cursor:pointer;font-family:inherit;transition:all .15s;white-space:nowrap}
+.pill.active{background:var(--text);color:#fff;border-color:var(--text)}
+.pill-tipo.real.active{background:#15803d;border-color:#15803d}
+.pill-tipo.proy.active{background:#1d4ed8;border-color:#1d4ed8}
+.pill-tipo.ambos.active{background:#1a1a18;border-color:#1a1a18}
+.filter-range{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text2)}
+.filter-range select{padding:4px 8px;border:1px solid var(--border);border-radius:6px;background:var(--bg2);color:var(--text);font-size:11px;font-family:inherit;cursor:pointer}
+.filter-badge{background:var(--blue-bg);color:var(--blue);border:1px solid #bfdbfe;border-radius:16px;padding:3px 10px;font-size:10px;font-weight:600}
+.filter-reset{padding:4px 10px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text3);font-size:11px;cursor:pointer;font-family:inherit;transition:all .15s}
+.filter-reset:hover{color:var(--text);border-color:var(--border2)}
+
+.main{padding:18px 24px;max-width:1300px;margin:0 auto}
+.view{display:none}.view.active{display:block}
+.sec{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:1.2px;margin:0 0 12px}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px 18px;margin-bottom:12px}
+.card-sm{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:12px 14px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px}
+.kpi-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:5px}
+.kpi-val{font-size:20px;font-weight:600;color:var(--text);letter-spacing:-0.5px;font-family:'IBM Plex Mono',monospace}
+.kpi-sub{font-size:11px;color:var(--text3);margin-top:3px}
+.tbl{width:100%;border-collapse:collapse;font-size:12px}
+.tbl th{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;padding:7px 10px;text-align:left;border-bottom:1px solid var(--border);font-weight:500}
+.tbl th:not(:first-child){text-align:right}
+.tbl td{padding:7px 10px;border-bottom:1px solid var(--border);vertical-align:middle}
+.tbl td:not(:first-child){text-align:right;font-family:'IBM Plex Mono',monospace;font-size:11px}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr:hover td{background:var(--bg3)}
+.chip{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600}
+.c-ok{background:var(--green-bg);color:var(--green)}
+.c-warn{background:var(--amber-bg);color:var(--amber)}
+.c-bad{background:var(--red-bg);color:var(--red)}
+.c-blue{background:var(--blue-bg);color:var(--blue)}
+.neg{color:var(--red)}.pos{color:var(--green)}
+.bar-wrap{height:4px;background:var(--bg3);border-radius:2px;margin-top:4px;overflow:hidden}
+.bar-fill{height:100%;border-radius:2px}
+.suc-sel{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.suc-btn{padding:4px 12px;border-radius:16px;border:1px solid var(--border);background:transparent;color:var(--text2);font-size:11px;font-weight:500;cursor:pointer;font-family:inherit;transition:all .15s}
+.suc-btn.active{background:var(--text);color:#fff;border-color:var(--text)}
+.alert{border-radius:8px;padding:9px 14px;margin-bottom:7px;font-size:12px;display:flex;gap:10px;align-items:flex-start;border:1px solid}
+.al-r{background:var(--red-bg);color:var(--red);border-color:#fecaca}
+.al-y{background:var(--amber-bg);color:var(--amber);border-color:#fde68a}
+.al-g{background:var(--green-bg);color:var(--green);border-color:#bbf7d0}
+.no-data{text-align:center;padding:32px;color:var(--text3);font-size:13px}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <div class="logo">W</div>
+    <div>
+      <div class="h-title">Walter S.A. — La C</div>
+      <div class="h-sub">Presupuesto 2026 · 6 sucursales</div>
+    </div>
+  </div>
+  <div class="nav">
+    <button class="nav-btn active" onclick="setView('pl',this)">P&L por sucursal</button>
+    <button class="nav-btn" onclick="setView('mes',this)">Mes a mes</button>
+    <button class="nav-btn" onclick="setView('rank',this)">Ranking & alertas</button>
+    <button class="nav-btn" onclick="setView('wf',this)">Waterfall</button>
+  </div>
+</div>
+
+<!-- FILTER BAR GLOBAL -->
+<div class="filter-bar">
+  <div class="filter-group">
+    <span class="filter-label">Período</span>
+    <div class="filter-range">
+      <select id="f-desde" onchange="applyFilters()">
+        <option value="1">Ene</option><option value="2">Feb</option><option value="3">Mar</option>
+        <option value="4">Abr</option><option value="5">May</option><option value="6">Jun</option>
+        <option value="7">Jul</option><option value="8">Ago</option><option value="9">Sep</option>
+        <option value="10">Oct</option><option value="11">Nov</option><option value="12">Dic</option>
+      </select>
+      <span style="color:var(--text3)">→</span>
+      <select id="f-hasta" onchange="applyFilters()">
+        <option value="1">Ene</option><option value="2">Feb</option><option value="3">Mar</option>
+        <option value="4">Abr</option><option value="5">May</option><option value="6">Jun</option>
+        <option value="7">Jul</option><option value="8">Ago</option><option value="9">Sep</option>
+        <option value="10">Oct</option><option value="11">Nov</option><option value="12" selected>Dic</option>
+      </select>
+    </div>
+  </div>
+  <div class="filter-group">
+    <span class="filter-label">Tipo</span>
+    <div class="filter-pills">
+      <button class="pill pill-tipo ambos active" id="tipo-ambos" onclick="setTipo('Ambos',this)">Ambos</button>
+      <button class="pill pill-tipo real" id="tipo-real" onclick="setTipo('Realizado',this)">Realizado</button>
+      <button class="pill pill-tipo proy" id="tipo-proy" onclick="setTipo('Proyectado',this)">Proyectado</button>
+    </div>
+  </div>
+  <div class="filter-group">
+    <span class="filter-label">Trim.</span>
+    <div class="filter-pills">
+      <button class="pill" onclick="setQuarter(1,this)">Q1</button>
+      <button class="pill" onclick="setQuarter(2,this)">Q2</button>
+      <button class="pill" onclick="setQuarter(3,this)">Q3</button>
+      <button class="pill" onclick="setQuarter(4,this)">Q4</button>
+    </div>
+  </div>
+  <span class="filter-badge" id="filter-badge">12 meses · Ambos</span>
+  <button class="filter-reset" onclick="resetFilters()">↺ Limpiar</button>
+</div>
+
+<div class="main">
+
+<!-- VIEW 1: P&L POR SUCURSAL -->
+<div class="view active" id="v-pl">
+  <div class="suc-sel" id="pl-sel"></div>
+  <div class="grid4" id="pl-kpis"></div>
+  <div class="grid2">
+    <div class="card">
+      <div class="sec">P&L detallado — período filtrado</div>
+      <table class="tbl" id="pl-table"></table>
+    </div>
+    <div class="card">
+      <div class="sec">Estructura de costos</div>
+      <div style="position:relative;height:240px"><canvas id="pl-donut" role="img" aria-label="Costos"></canvas></div>
+      <div id="pl-legend" style="margin-top:10px"></div>
+    </div>
+  </div>
+</div>
+
+<!-- VIEW 2: MES A MES -->
+<div class="view" id="v-mes">
+  <div class="grid4" id="mes-kpis"></div>
+  <div class="card">
+    <div class="sec">Ingresos vs UT Operativa — meses filtrados (Gs. millones)</div>
+    <div id="mes-legend" style="display:flex;gap:16px;margin-bottom:10px;font-size:11px;color:var(--text2)"></div>
+    <div style="position:relative;height:210px"><canvas id="mes-bar" role="img" aria-label="Ingresos y UT mensual"></canvas></div>
+  </div>
+  <div class="card">
+    <div class="sec">Composición de egresos mensual (Gs. millones)</div>
+    <div id="mes-stack-legend" style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:10px;font-size:11px;color:var(--text2)"></div>
+    <div style="position:relative;height:190px"><canvas id="mes-stack" role="img" aria-label="Egresos apilados"></canvas></div>
+  </div>
+</div>
+
+<!-- VIEW 3: RANKING & ALERTAS -->
+<div class="view" id="v-rank">
+  <div class="grid2">
+    <div class="card">
+      <div class="sec">Ranking — período filtrado</div>
+      <div id="rank-bars"></div>
+    </div>
+    <div class="card">
+      <div class="sec">Mapa de calor — margen mensual</div>
+      <div id="heatmap"></div>
+    </div>
+  </div>
+  <div class="card"><div class="sec">Alertas</div><div id="alertas"></div></div>
+  <div class="card"><div class="sec">Tabla comparativa</div><table class="tbl" id="rank-table"></table></div>
+</div>
+
+<!-- VIEW 4: WATERFALL -->
+<div class="view" id="v-wf">
+  <div class="grid3" id="wf-kpis"></div>
+  <div class="card">
+    <div class="sec">Cascada P&L — período filtrado (Gs. millones)</div>
+    <div style="position:relative;height:300px"><canvas id="wf-chart" role="img" aria-label="Waterfall P&L"></canvas></div>
+  </div>
+  <div class="card"><div class="sec">Detalle por rubro</div><table class="tbl" id="wf-table"></table></div>
+</div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const RAW = {"pl_monthly":{"La Provista":[{"mes":"Ene","num":1,"tipo":"Realizado","Ingreso Neto":641927540,"Costos de Producción":285242803,"Gastos del Personal":180000000,"Gastos de Ventas":3700000,"Gastos de Ocupación":50000000,"Otros Gastos":7000000,"Impuestos y Tasas":1300000,"Gastos Financieros":21228448,"UT Operativa":153059131},{"mes":"Feb","num":2,"tipo":"Realizado","Ingreso Neto":536149528,"Costos de Producción":276543798,"Gastos del Personal":180000000,"Gastos de Ventas":3700000,"Gastos de Ocupación":50000000,"Otros Gastos":7000000,"Impuestos y Tasas":1300000,"Gastos Financieros":17761286,"UT Operativa":4762978},{"mes":"Mar","num":3,"tipo":"Realizado","Ingreso Neto":575701039,"Costos de Producción":296654044,"Gastos del Personal":180000000,"Gastos de Ventas":3700000,"Gastos de Ocupación":50000000,"Otros Gastos":7000000,"Impuestos y Tasas":1300000,"Gastos Financieros":22838111,"UT Operativa":22496515},{"mes":"Abr","num":4,"tipo":"Realizado","Ingreso Neto":560165945,"Costos de Producción":280263863,"Gastos del Personal":180000000,"Gastos de Ventas":3700000,"Gastos de Ocupación":50000000,"Otros Gastos":7000000,"Impuestos y Tasas":1300000,"Gastos Financieros":21256871,"UT Operativa":102287354},{"mes":"May","num":5,"tipo":"Proyectado","Ingreso Neto":707614946,"Costos de Producción":312791516,"Gastos del Personal":180000000,"Gastos de Ventas":3700000,"Gastos de Ocupación":50000000,"Otros Gastos":7000000,"Impuestos y Tasas":1300000,"Gastos Financieros":21228448,"UT Operativa":131594981},{"mes":"Jun","num":6,"tipo":"Proyectado","Ingreso Neto":592042866,"Costos de Producción":261704458,"Gastos del Personal":180000000,"Gastos de Ventas":3700000,"Gastos de Ocupación":50000000,"Otros Gastos":7000000,"Impuestos y Tasas":1300000,"Gastos Financieros":17761286,"UT Operativa":70577122},{"mes":"Jul","num":7,"tipo":"Proyectado","Ingreso Neto":761270359,"Costos de Producción":336509158,"Gastos del Personal":180000000,"Gastos de Ventas":3700000,"Gastos de Ocupación":50000000,"Otros Gastos":7000000,"Impuestos y Tasas":1300000,"Gastos Financieros":22838111,"UT Operativa":159923090},{"mes":"Ago","num":8,"tipo":"Proyectado","Ingreso Neto":708562353,"Costos de Producción":313210304,"Gastos del Personal":180000000,"Gastos de Ventas":3700000,"Gastos de Ocupación":50000000,"Otros Gastos":7000000,"Impuestos y Tasas":1300000,"Gastos Financieros":21256871,"UT Operativa":132095178},{"mes":"Sep","num":9,"tipo":"Proyectado","Ingreso Neto":638339228,"Costos de Producción":282169132,"Gastos del Personal":180000000,"Gastos de Ventas":3700000,"Gastos de Ocupación":50000000,"Otros Gastos":7000000,"Impuestos y Tasas":1300000,"Gastos Financieros":19150177,"UT Operativa":95019919},{"mes":"Oct","num":10,"tipo":"Proyectado","Ingreso Neto":681784505,"Costos de Producción":301373523,"Gastos del Personal":180000000,"Gastos de Ventas":3700000,"Gastos de Ocupación":50000000,"Otros Gastos":7000000,"Impuestos y Tasas":1300000,"Gastos Financieros":20453535,"UT Operativa":117957447},{"mes":"Nov","num":11,"tipo":"Proyectado","Ingreso Neto":688469386,"Costos de Producción":304257170,"Gastos del Personal":180000000,"Gastos de Ventas":3700000,"Gastos de Ocupación":50000000,"Otros Gastos":7000000,"Impuestos y Tasas":1300000,"Gastos Financieros":20684216,"UT Operativa":121486822},{"mes":"Dic","num":12,"tipo":"Proyectado","Ingreso Neto":629395753,"Costos de Producción":278429937,"Gastos del Personal":180000000,"Gastos de Ventas":3700000,"Gastos de Ocupación":50000000,"Otros Gastos":7000000,"Impuestos y Tasas":1300000,"Gastos Financieros":18969537,"UT Operativa":90298091}],"Pez de Mar Dulce":[{"mes":"Ene","num":1,"tipo":"Realizado","Ingreso Neto":259599160,"Costos de Producción":101945421,"Gastos del Personal":87271459,"Gastos de Ventas":4527433,"Gastos de Ocupación":37794509,"Otros Gastos":6243846,"Impuestos y Tasas":853895,"Gastos Financieros":8308599,"UT Operativa":12653998},{"mes":"Feb","num":2,"tipo":"Realizado","Ingreso Neto":274225812,"Costos de Producción":137351442,"Gastos del Personal":112000000,"Gastos de Ventas":4500000,"Gastos de Ocupación":37000000,"Otros Gastos":6500000,"Impuestos y Tasas":1100000,"Gastos Financieros":9310015,"UT Operativa":-48130715},{"mes":"Mar","num":3,"tipo":"Realizado","Ingreso Neto":223504852,"Costos de Producción":117731004,"Gastos del Personal":112000000,"Gastos de Ventas":4500000,"Gastos de Ocupación":37000000,"Otros Gastos":6500000,"Impuestos y Tasas":1100000,"Gastos Financieros":10338708,"UT Operativa":-70026162},{"mes":"Abr","num":4,"tipo":"Realizado","Ingreso Neto":286579457,"Costos de Producción":147437785,"Gastos del Personal":112000000,"Gastos de Ventas":4500000,"Gastos de Ocupación":37000000,"Otros Gastos":6500000,"Impuestos y Tasas":1100000,"Gastos Financieros":10505720,"UT Operativa":-41667460},{"mes":"May","num":5,"tipo":"Proyectado","Ingreso Neto":413234103,"Costos de Producción":177690664,"Gastos del Personal":112000000,"Gastos de Ventas":4500000,"Gastos de Ocupación":37000000,"Otros Gastos":6500000,"Impuestos y Tasas":1100000,"Gastos Financieros":12397023,"UT Operativa":62046416},{"mes":"Jun","num":6,"tipo":"Proyectado","Ingreso Neto":310333846,"Costos de Producción":133443554,"Gastos del Personal":112000000,"Gastos de Ventas":4500000,"Gastos de Ocupación":37000000,"Otros Gastos":6500000,"Impuestos y Tasas":1100000,"Gastos Financieros":9310015,"UT Operativa":6480277},{"mes":"Jul","num":7,"tipo":"Proyectado","Ingreso Neto":344623587,"Costos de Producción":148188142,"Gastos del Personal":112000000,"Gastos de Ventas":4500000,"Gastos de Ocupación":37000000,"Otros Gastos":6500000,"Impuestos y Tasas":1100000,"Gastos Financieros":10338708,"UT Operativa":24996737},{"mes":"Ago","num":8,"tipo":"Proyectado","Ingreso Neto":350190652,"Costos de Producción":150581980,"Gastos del Personal":112000000,"Gastos de Ventas":4500000,"Gastos de Ocupación":37000000,"Otros Gastos":6500000,"Impuestos y Tasas":1100000,"Gastos Financieros":10505720,"UT Operativa":28002952},{"mes":"Sep","num":9,"tipo":"Proyectado","Ingreso Neto":284300969,"Costos de Producción":122249417,"Gastos del Personal":112000000,"Gastos de Ventas":4500000,"Gastos de Ocupación":37000000,"Otros Gastos":6500000,"Impuestos y Tasas":1100000,"Gastos Financieros":8529029,"UT Operativa":-7577477},{"mes":"Oct","num":10,"tipo":"Proyectado","Ingreso Neto":428604956,"Costos de Producción":184300131,"Gastos del Personal":112000000,"Gastos de Ventas":4500000,"Gastos de Ocupación":37000000,"Otros Gastos":6500000,"Impuestos y Tasas":1100000,"Gastos Financieros":12858149,"UT Operativa":70346676},{"mes":"Nov","num":11,"tipo":"Proyectado","Ingreso Neto":248066775,"Costos de Producción":106892577,"Gastos del Personal":112000000,"Gastos de Ventas":4500000,"Gastos de Ocupación":37000000,"Otros Gastos":6500000,"Impuestos y Tasas":1100000,"Gastos Financieros":7437369,"UT Operativa":-27462171},{"mes":"Dic","num":12,"tipo":"Proyectado","Ingreso Neto":368009831,"Costos de Producción":158250562,"Gastos del Personal":112000000,"Gastos de Ventas":4500000,"Gastos de Ocupación":37000000,"Otros Gastos":6500000,"Impuestos y Tasas":1100000,"Gastos Financieros":11053230,"UT Operativa":37942039}],"Patria":[{"mes":"Ene","num":1,"tipo":"Realizado","Ingreso Neto":677052169,"Costos de Producción":269078494,"Gastos del Personal":119611642,"Gastos de Ventas":26443320,"Gastos de Ocupación":48837520,"Otros Gastos":6243845,"Impuestos y Tasas":853895,"Gastos Financieros":22135625,"UT Operativa":183847827},{"mes":"Feb","num":2,"tipo":"Realizado","Ingreso Neto":729300137,"Costos de Producción":366090548,"Gastos del Personal":121000000,"Gastos de Ventas":8000000,"Gastos de Ocupación":46000000,"Otros Gastos":7000000,"Impuestos y Tasas":1400000,"Gastos Financieros":22201475,"UT Operativa":166332128},{"mes":"Mar","num":3,"tipo":"Realizado","Ingreso Neto":762567026,"Costos de Producción":401040359,"Gastos del Personal":121000000,"Gastos de Ventas":8000000,"Gastos de Ocupación":46000000,"Otros Gastos":7000000,"Impuestos y Tasas":1400000,"Gastos Financieros":25228988,"UT Operativa":159493183},{"mes":"Abr","num":4,"tipo":"Realizado","Ingreso Neto":807966176,"Costos de Producción":359248462,"Gastos del Personal":121000000,"Gastos de Ventas":8000000,"Gastos de Ocupación":46000000,"Otros Gastos":7000000,"Impuestos y Tasas":1400000,"Gastos Financieros":23918395,"UT Operativa":237212333},{"mes":"May","num":5,"tipo":"Proyectado","Ingreso Neto":814766913,"Costos de Producción":350349773,"Gastos del Personal":121000000,"Gastos de Ventas":8000000,"Gastos de Ocupación":46000000,"Otros Gastos":7000000,"Impuestos y Tasas":1400000,"Gastos Financieros":24443007,"UT Operativa":256059383},{"mes":"Jun","num":6,"tipo":"Proyectado","Ingreso Neto":740049170,"Costos de Producción":318221143,"Gastos del Personal":121000000,"Gastos de Ventas":8000000,"Gastos de Ocupación":46000000,"Otros Gastos":7000000,"Impuestos y Tasas":1400000,"Gastos Financieros":22201475,"UT Operativa":215711802},{"mes":"Jul","num":7,"tipo":"Proyectado","Ingreso Neto":840966279,"Costos de Producción":361615500,"Gastos del Personal":121000000,"Gastos de Ventas":8000000,"Gastos de Ocupación":46000000,"Otros Gastos":7000000,"Impuestos y Tasas":1400000,"Gastos Financieros":25228988,"UT Operativa":270207041},{"mes":"Ago","num":8,"tipo":"Proyectado","Ingreso Neto":858847355,"Costos de Producción":369304363,"Gastos del Personal":121000000,"Gastos de Ventas":8000000,"Gastos de Ocupación":46000000,"Otros Gastos":7000000,"Impuestos y Tasas":1400000,"Gastos Financieros":25765421,"UT Operativa":279862822},{"mes":"Sep","num":9,"tipo":"Proyectado","Ingreso Neto":815133592,"Costos de Producción":350507444,"Gastos del Personal":121000000,"Gastos de Ventas":8000000,"Gastos de Ocupación":46000000,"Otros Gastos":7000000,"Impuestos y Tasas":1400000,"Gastos Financieros":24454008,"UT Operativa":256257390},{"mes":"Oct","num":10,"tipo":"Proyectado","Ingreso Neto":915009596,"Costos de Producción":393454126,"Gastos del Personal":121000000,"Gastos de Ventas":8000000,"Gastos de Ocupación":46000000,"Otros Gastos":7000000,"Impuestos y Tasas":1400000,"Gastos Financieros":27450288,"UT Operativa":310190432},{"mes":"Nov","num":11,"tipo":"Proyectado","Ingreso Neto":1082746186,"Costos de Producción":465665974,"Gastos del Personal":121000000,"Gastos de Ventas":8000000,"Gastos de Ocupación":46000000,"Otros Gastos":7000000,"Impuestos y Tasas":1400000,"Gastos Financieros":32498335,"UT Operativa":401181877},{"mes":"Dic","num":12,"tipo":"Proyectado","Ingreso Neto":753366976,"Costos de Producción":323862494,"Gastos del Personal":121000000,"Gastos de Ventas":8000000,"Gastos de Ocupación":46000000,"Otros Gastos":7000000,"Impuestos y Tasas":1400000,"Gastos Financieros":22620893,"UT Operativa":223683589}],"Pinton":[{"mes":"Ene","num":1,"tipo":"Realizado","Ingreso Neto":271276363,"Costos de Producción":105518810,"Gastos del Personal":92620644,"Gastos de Ventas":4846705,"Gastos de Ocupación":33721865,"Otros Gastos":6243845,"Impuestos y Tasas":808891,"Gastos Financieros":9248909,"UT Operativa":18266694},{"mes":"Feb","num":2,"tipo":"Realizado","Ingreso Neto":250676930,"Costos de Producción":129557636,"Gastos del Personal":92000000,"Gastos de Ventas":6600000,"Gastos de Ocupación":25500000,"Otros Gastos":7200000,"Impuestos y Tasas":220000,"Gastos Financieros":7801036,"UT Operativa":-24618317},{"mes":"Mar","num":3,"tipo":"Realizado","Ingreso Neto":252637895,"Costos de Producción":134342208,"Gastos del Personal":92000000,"Gastos de Ventas":6600000,"Gastos de Ocupación":25500000,"Otros Gastos":7200000,"Impuestos y Tasas":220000,"Gastos Financieros":9186856,"UT Operativa":-16841414},{"mes":"Abr","num":4,"tipo":"Realizado","Ingreso Neto":231708272,"Costos de Producción":107368575,"Gastos del Personal":92000000,"Gastos de Ventas":6600000,"Gastos de Ocupación":25500000,"Otros Gastos":7200000,"Impuestos y Tasas":220000,"Gastos Financieros":10423848,"UT Operativa":-1837766},{"mes":"May","num":5,"tipo":"Proyectado","Ingreso Neto":375332805,"Costos de Producción":161393106,"Gastos del Personal":92000000,"Gastos de Ventas":6600000,"Gastos de Ocupación":25500000,"Otros Gastos":7200000,"Impuestos y Tasas":220000,"Gastos Financieros":11259984,"UT Operativa":71159715},{"mes":"Jun","num":6,"tipo":"Proyectado","Ingreso Neto":260034542,"Costos de Producción":111814853,"Gastos del Personal":92000000,"Gastos de Ventas":6600000,"Gastos de Ocupación":25500000,"Otros Gastos":7200000,"Impuestos y Tasas":220000,"Gastos Financieros":7801036,"UT Operativa":8898652},{"mes":"Jul","num":7,"tipo":"Proyectado","Ingreso Neto":306228533,"Costos de Producción":131678269,"Gastos del Personal":92000000,"Gastos de Ventas":6600000,"Gastos de Ocupación":25500000,"Otros Gastos":7200000,"Impuestos y Tasas":220000,"Gastos Financieros":9186856,"UT Operativa":33843408},{"mes":"Ago","num":8,"tipo":"Proyectado","Ingreso Neto":347461589,"Costos de Producción":149408483,"Gastos del Personal":92000000,"Gastos de Ventas":6600000,"Gastos de Ocupación":25500000,"Otros Gastos":7200000,"Impuestos y Tasas":220000,"Gastos Financieros":10423848,"UT Operativa":56109258},{"mes":"Sep","num":9,"tipo":"Proyectado","Ingreso Neto":244840069,"Costos de Producción":105281230,"Gastos del Personal":92000000,"Gastos de Ventas":6600000,"Gastos de Ocupación":25500000,"Otros Gastos":7200000,"Impuestos y Tasas":220000,"Gastos Financieros":7345202,"UT Operativa":693637},{"mes":"Oct","num":10,"tipo":"Proyectado","Ingreso Neto":446796855,"Costos de Producción":192122648,"Gastos del Personal":92000000,"Gastos de Ventas":6600000,"Gastos de Ocupación":25500000,"Otros Gastos":7200000,"Impuestos y Tasas":220000,"Gastos Financieros":13403906,"UT Operativa":109750302},{"mes":"Nov","num":11,"tipo":"Proyectado","Ingreso Neto":356801447,"Costos de Producción":153435624,"Gastos del Personal":92000000,"Gastos de Ventas":6600000,"Gastos de Ocupación":25500000,"Otros Gastos":7200000,"Impuestos y Tasas":220000,"Gastos Financieros":10697244,"UT Operativa":61148579},{"mes":"Dic","num":12,"tipo":"Proyectado","Ingreso Neto":324199428,"Costos de Producción":139454552,"Gastos del Personal":92000000,"Gastos de Ventas":6600000,"Gastos de Ocupación":25500000,"Otros Gastos":7200000,"Impuestos y Tasas":220000,"Gastos Financieros":9723720,"UT Operativa":43501156}],"Porvenir":[{"mes":"Ene","num":1,"tipo":"Realizado","Ingreso Neto":349456278,"Costos de Producción":137855165,"Gastos del Personal":104528300,"Gastos de Ventas":1731160,"Gastos de Ocupación":19327759,"Otros Gastos":5926781,"Impuestos y Tasas":854685,"Gastos Financieros":11628272,"UT Operativa":67604155},{"mes":"Feb","num":2,"tipo":"Realizado","Ingreso Neto":309486966,"Costos de Producción":151897384,"Gastos del Personal":94000000,"Gastos de Ventas":2400000,"Gastos de Ocupación":24000000,"Otros Gastos":7200000,"Impuestos y Tasas":1000000,"Gastos Financieros":10000000,"UT Operativa":8003964},{"mes":"Mar","num":3,"tipo":"Realizado","Ingreso Neto":303982212,"Costos de Producción":159778855,"Gastos del Personal":94000000,"Gastos de Ventas":2400000,"Gastos de Ocupación":24000000,"Otros Gastos":7200000,"Impuestos y Tasas":1000000,"Gastos Financieros":10000000,"UT Operativa":11532316},{"mes":"Abr","num":4,"tipo":"Realizado","Ingreso Neto":290626638,"Costos de Producción":152027406,"Gastos del Personal":94000000,"Gastos de Ventas":2400000,"Gastos de Ocupación":24000000,"Otros Gastos":7200000,"Impuestos y Tasas":1000000,"Gastos Financieros":10000000,"UT Operativa":12092089},{"mes":"May","num":5,"tipo":"Proyectado","Ingreso Neto":350000000,"Costos de Producción":150500000,"Gastos del Personal":94000000,"Gastos de Ventas":2400000,"Gastos de Ocupación":24000000,"Otros Gastos":7200000,"Impuestos y Tasas":1000000,"Gastos Financieros":10000000,"UT Operativa":60900000},{"mes":"Jun","num":6,"tipo":"Proyectado","Ingreso Neto":350000000,"Costos de Producción":150500000,"Gastos del Personal":94000000,"Gastos de Ventas":2400000,"Gastos de Ocupación":24000000,"Otros Gastos":7200000,"Impuestos y Tasas":1000000,"Gastos Financieros":10000000,"UT Operativa":60900000},{"mes":"Jul","num":7,"tipo":"Proyectado","Ingreso Neto":350000000,"Costos de Producción":150500000,"Gastos del Personal":94000000,"Gastos de Ventas":2400000,"Gastos de Ocupación":24000000,"Otros Gastos":7200000,"Impuestos y Tasas":1000000,"Gastos Financieros":10000000,"UT Operativa":60900000},{"mes":"Ago","num":8,"tipo":"Proyectado","Ingreso Neto":350000000,"Costos de Producción":150500000,"Gastos del Personal":94000000,"Gastos de Ventas":2400000,"Gastos de Ocupación":24000000,"Otros Gastos":7200000,"Impuestos y Tasas":1000000,"Gastos Financieros":10000000,"UT Operativa":60900000},{"mes":"Sep","num":9,"tipo":"Proyectado","Ingreso Neto":354269009,"Costos de Producción":152335674,"Gastos del Personal":94000000,"Gastos de Ventas":2400000,"Gastos de Ocupación":24000000,"Otros Gastos":7200000,"Impuestos y Tasas":1000000,"Gastos Financieros":10000000,"UT Operativa":63333335},{"mes":"Oct","num":10,"tipo":"Proyectado","Ingreso Neto":468607902,"Costos de Producción":201501398,"Gastos del Personal":94000000,"Gastos de Ventas":2400000,"Gastos de Ocupación":24000000,"Otros Gastos":7200000,"Impuestos y Tasas":1000000,"Gastos Financieros":10000000,"UT Operativa":128506504},{"mes":"Nov","num":11,"tipo":"Proyectado","Ingreso Neto":351896329,"Costos de Producción":151337381,"Gastos del Personal":94000000,"Gastos de Ventas":2400000,"Gastos de Ocupación":24000000,"Otros Gastos":7200000,"Impuestos y Tasas":1000000,"Gastos Financieros":10000000,"UT Operativa":61958948},{"mes":"Dic","num":12,"tipo":"Proyectado","Ingreso Neto":391458439,"Costos de Producción":168304558,"Gastos del Personal":94000000,"Gastos de Ventas":2400000,"Gastos de Ocupación":24000000,"Otros Gastos":7200000,"Impuestos y Tasas":1000000,"Gastos Financieros":10000000,"UT Operativa":84553881}],"Pétalo de Estrellas":[{"mes":"Ene","num":1,"tipo":"Realizado","Ingreso Neto":767434589,"Costos de Producción":165173107,"Gastos del Personal":133523366,"Gastos de Ventas":23724445,"Gastos de Ocupación":45343702,"Otros Gastos":34854330,"Impuestos y Tasas":45530,"Gastos Financieros":24590785,"UT Operativa":340179324},{"mes":"Feb","num":2,"tipo":"Realizado","Ingreso Neto":167572030,"Costos de Producción":83683905,"Gastos del Personal":9190607,"Gastos de Ventas":17636364,"Gastos de Ocupación":2362122,"Otros Gastos":15413864,"Impuestos y Tasas":41708,"Gastos Financieros":12081029,"UT Operativa":27162431},{"mes":"Mar","num":3,"tipo":"Realizado","Ingreso Neto":12993345,"Costos de Producción":9994254,"Gastos del Personal":412727,"Gastos de Ventas":2646364,"Gastos de Ocupación":2617849,"Otros Gastos":6323819,"Impuestos y Tasas":68900,"Gastos Financieros":1697740,"UT Operativa":-10768308},{"mes":"Abr","num":4,"tipo":"Realizado","Ingreso Neto":114948394,"Costos de Producción":58696689,"Gastos del Personal":16240000,"Gastos de Ventas":0,"Gastos de Ocupación":4544168,"Otros Gastos":10832874,"Impuestos y Tasas":69670,"Gastos Financieros":5257811,"UT Operativa":19307182},{"mes":"May","num":5,"tipo":"Proyectado","Ingreso Neto":0,"Costos de Producción":0,"Gastos del Personal":0,"Gastos de Ventas":0,"Gastos de Ocupación":0,"Otros Gastos":0,"Impuestos y Tasas":0,"Gastos Financieros":0,"UT Operativa":0},{"mes":"Jun","num":6,"tipo":"Proyectado","Ingreso Neto":0,"Costos de Producción":0,"Gastos del Personal":0,"Gastos de Ventas":0,"Gastos de Ocupación":0,"Otros Gastos":0,"Impuestos y Tasas":0,"Gastos Financieros":0,"UT Operativa":0},{"mes":"Jul","num":7,"tipo":"Proyectado","Ingreso Neto":0,"Costos de Producción":0,"Gastos del Personal":0,"Gastos de Ventas":0,"Gastos de Ocupación":0,"Otros Gastos":0,"Impuestos y Tasas":0,"Gastos Financieros":0,"UT Operativa":0},{"mes":"Ago","num":8,"tipo":"Proyectado","Ingreso Neto":118414768,"Costos de Producción":43797782,"Gastos del Personal":23694409,"Gastos de Ventas":61176641,"Gastos de Ocupación":50613704,"Otros Gastos":48170646,"Impuestos y Tasas":45794,"Gastos Financieros":15897561,"UT Operativa":-125001769},{"mes":"Sep","num":9,"tipo":"Proyectado","Ingreso Neto":0,"Costos de Producción":0,"Gastos del Personal":0,"Gastos de Ventas":0,"Gastos de Ocupación":0,"Otros Gastos":0,"Impuestos y Tasas":0,"Gastos Financieros":0,"UT Operativa":0},{"mes":"Oct","num":10,"tipo":"Proyectado","Ingreso Neto":0,"Costos de Producción":0,"Gastos del Personal":0,"Gastos de Ventas":0,"Gastos de Ocupación":0,"Otros Gastos":0,"Impuestos y Tasas":0,"Gastos Financieros":0,"UT Operativa":0},{"mes":"Nov","num":11,"tipo":"Proyectado","Ingreso Neto":0,"Costos de Producción":0,"Gastos del Personal":0,"Gastos de Ventas":0,"Gastos de Ocupación":0,"Otros Gastos":0,"Impuestos y Tasas":0,"Gastos Financieros":0,"UT Operativa":0},{"mes":"Dic","num":12,"tipo":"Proyectado","Ingreso Neto":424522019,"Costos de Producción":193038700,"Gastos del Personal":24687399,"Gastos de Ventas":78543731,"Gastos de Ocupación":219854478,"Otros Gastos":57953015,"Impuestos y Tasas":5065794,"Gastos Financieros":43627365,"UT Operativa":-420268483}]},"sucs":["La Provista","Pez de Mar Dulce","Patria","Pinton","Porvenir","Pétalo de Estrellas"]};
+
+const MESES_LABEL = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+const EG_CATS = ['Costos de Producción','Gastos del Personal','Gastos de Ocupación','Gastos Financieros','Otros Gastos','Gastos de Ventas','Impuestos y Tasas'];
+const EG_COLORS = ['#1d4ed8','#7c3aed','#0891b2','#d97706','#059669','#dc2626','#9333ea'];
+const EG_MAP = Object.fromEntries(EG_CATS.map((c,i)=>[c,EG_COLORS[i]]));
+const SUC_COLORS = {'La Provista':'#1d4ed8','Pez de Mar Dulce':'#dc2626','Patria':'#059669','Pinton':'#d97706','Porvenir':'#7c3aed','Pétalo de Estrellas':'#0891b2'};
+const TICK = {color:'#a8a7a3',font:{family:"'IBM Plex Sans'",size:10}};
+const GRID = {color:'rgba(0,0,0,0.04)',drawBorder:false};
+const TT = {backgroundColor:'#1a1a18',borderColor:'#dddcd8',borderWidth:1,titleColor:'#fff',bodyColor:'#a8a7a3',padding:10,cornerRadius:6};
+const fmt = v => Math.round(v/1e6).toLocaleString('es-PY');
+const fmtB = v => (v/1e9).toFixed(2);
+
+// ---- FILTER STATE ----
+let fDesde = 1, fHasta = 12, fTipo = 'Ambos';
+let currentView = 'pl';
+let activeSuc = 'Patria';
+let plChart=null, mesBarChart=null, mesStackChart=null, wfChart=null;
+
+function getFiltered(suc) {
+  return RAW.pl_monthly[suc].filter(m => {
+    const inRange = m.num >= fDesde && m.num <= fHasta;
+    const inTipo = fTipo === 'Ambos' || m.tipo === fTipo;
+    return inRange && inTipo;
+  });
+}
+
+function getAllFiltered() {
+  const result = {};
+  RAW.sucs.forEach(s => result[s] = getFiltered(s));
+  return result;
+}
+
+function sumField(rows, field) { return rows.reduce((s,r)=>s+r[field],0); }
+
+function updateBadge() {
+  const n = fHasta - fDesde + 1;
+  const desde = MESES_LABEL[fDesde-1], hasta = MESES_LABEL[fHasta-1];
+  document.getElementById('filter-badge').textContent = `${desde}–${hasta} (${n} mes${n>1?'es':''}) · ${fTipo}`;
+}
+
+function applyFilters() {
+  fDesde = parseInt(document.getElementById('f-desde').value);
+  fHasta = parseInt(document.getElementById('f-hasta').value);
+  if(fHasta < fDesde) { fHasta = fDesde; document.getElementById('f-hasta').value = fDesde; }
+  updateBadge();
+  refreshView();
+}
+
+function setTipo(t, btn) {
+  fTipo = t;
+  document.querySelectorAll('.pill-tipo').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  updateBadge();
+  refreshView();
+}
+
+function setQuarter(q, btn) {
+  document.querySelectorAll('.pill-tipo').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tipo-ambos').classList.add('active');
+  fTipo = 'Ambos';
+  fDesde = (q-1)*3+1; fHasta = q*3;
+  document.getElementById('f-desde').value = fDesde;
+  document.getElementById('f-hasta').value = fHasta;
+  updateBadge();
+  refreshView();
+}
+
+function resetFilters() {
+  fDesde=1; fHasta=12; fTipo='Ambos';
+  document.getElementById('f-desde').value=1;
+  document.getElementById('f-hasta').value=12;
+  document.querySelectorAll('.pill-tipo').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tipo-ambos').classList.add('active');
+  updateBadge();
+  refreshView();
+}
+
+function refreshView() {
+  if(currentView==='pl') renderPL();
+  if(currentView==='mes') buildMes();
+  if(currentView==='rank') buildRank();
+  if(currentView==='wf') buildWF();
+}
+
+function setView(v, btn) {
+  document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(el=>el.classList.remove('active'));
+  document.getElementById('v-'+v).classList.add('active');
+  btn.classList.add('active');
+  currentView = v;
+  refreshView();
+}
+
+// ===== VIEW 1: P&L =====
+function buildPL() {
+  document.getElementById('pl-sel').innerHTML = RAW.sucs.map(s=>
+    `<button class="suc-btn${s===activeSuc?' active':''}" onclick="selectSuc('${s}',this)">${s}</button>`
+  ).join('');
+  renderPL();
+}
+
+function selectSuc(s, btn) {
+  activeSuc = s;
+  document.querySelectorAll('#pl-sel .suc-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderPL();
+}
+
+function renderPL() {
+  const rows = getFiltered(activeSuc);
+  if(!rows.length){ document.getElementById('pl-kpis').innerHTML='<div class="no-data" style="grid-column:1/-1">Sin datos para el filtro seleccionado</div>'; return; }
+  const ing=sumField(rows,'Ingreso Neto'), ut=sumField(rows,'UT Operativa');
+  const totalEg=EG_CATS.reduce((s,c)=>s+sumField(rows,c),0);
+  const margen = ing>0?(ut/ing*100).toFixed(1):0;
+
+  document.getElementById('pl-kpis').innerHTML=[
+    ['Ingreso Neto','Gs.'+fmtB(ing)+'B',rows.length+' meses'],
+    ['UT Operativa','Gs.'+fmtB(ut)+'B',margen+'% margen'],
+    ['Total Egresos','Gs.'+fmtB(totalEg)+'B',ing>0?(totalEg/ing*100).toFixed(1)+'% s/ingreso':'—'],
+    ['UT post IRE',ing>0?'Gs.'+fmtB(ut*0.9)+'B':'—','estimado –10% IRE'],
+  ].map(([l,v,s])=>`<div class="card-sm"><div class="kpi-label">${l}</div><div class="kpi-val" style="font-size:18px">${v}</div><div class="kpi-sub">${s}</div></div>`).join('');
+
+  document.getElementById('pl-table').innerHTML=`
+    <thead><tr><th>Cuenta</th><th>Gs. Millones</th><th>% Ingreso</th></tr></thead>
+    <tbody>
+    <tr><td><strong>Ingreso Neto</strong></td><td>${fmt(ing)}</td><td>100%</td></tr>
+    ${EG_CATS.map(c=>{const v=sumField(rows,c);return`<tr><td style="color:#6b6a66;padding-left:16px">— ${c}</td><td class="neg">(${fmt(v)})</td><td style="color:#a8a7a3">${ing>0?(v/ing*100).toFixed(1)+'%':'—'}</td></tr>`}).join('')}
+    <tr style="border-top:2px solid #dddcd8"><td><strong>UT Operativa</strong></td><td class="${ut>=0?'pos':'neg'}">${fmt(ut)}</td><td class="${ut>=0?'pos':'neg'}">${margen}%</td></tr>
+    </tbody>`;
+
+  if(plChart) plChart.destroy();
+  const egVals = EG_CATS.map(c=>sumField(rows,c));
+  plChart = new Chart(document.getElementById('pl-donut'),{
+    type:'doughnut',
+    data:{labels:EG_CATS.map(c=>c.replace('Costos de ','C.').replace('Gastos del ','G.').replace('Gastos de ','G.')),
+      datasets:[{data:egVals,backgroundColor:EG_COLORS,borderWidth:2,borderColor:'#fff',hoverOffset:5}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'65%',
+      plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:ctx=>' '+ctx.label+': Gs.'+fmt(ctx.raw)+'M'}}}}
+  });
+  const tot=egVals.reduce((a,b)=>a+b,0);
+  document.getElementById('pl-legend').innerHTML=EG_CATS.map((c,i)=>{
+    const pct=tot>0?(egVals[i]/tot*100).toFixed(1):0;
+    return`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+      <div style="display:flex;align-items:center;gap:6px"><div style="width:8px;height:8px;border-radius:2px;background:${EG_COLORS[i]}"></div><span style="font-size:11px;color:#6b6a66">${c.replace('Costos de ','C. ').replace('Gastos del ','G. ').replace('Gastos de ','G. ')}</span></div>
+      <span style="font-size:11px;font-family:'IBM Plex Mono';color:#a8a7a3">${pct}%</span></div>
+    <div class="bar-wrap"><div class="bar-fill" style="width:${pct}%;background:${EG_COLORS[i]}"></div></div>`;
+  }).join('');
+}
+
+// ===== VIEW 2: MES A MES =====
+function buildMes() {
+  const allF = getAllFiltered();
+  const mesesData = [];
+  for(let m=fDesde; m<=fHasta; m++){
+    if(fTipo!=='Ambos' && MESES_LABEL[m-1] && RAW.pl_monthly['La Provista'].find(r=>r.num===m)?.tipo !== fTipo) {
+      const row = RAW.pl_monthly['La Provista'].find(r=>r.num===m);
+      if(row && row.tipo !== fTipo) continue;
+    }
+    const mesRows = RAW.sucs.map(s=>RAW.pl_monthly[s].find(r=>r.num===m && (fTipo==='Ambos'||r.tipo===fTipo))).filter(Boolean);
+    if(!mesRows.length) continue;
+    const entry = {mes:MESES_LABEL[m-1], num:m, tipo:mesRows[0]?.tipo||'—'};
+    ['Ingreso Neto','UT Operativa',...EG_CATS].forEach(c=>entry[c]=mesRows.reduce((s,r)=>s+(r[c]||0),0));
+    entry.margen = entry['Ingreso Neto']>0?+(entry['UT Operativa']/entry['Ingreso Neto']*100).toFixed(1):0;
+    mesesData.push(entry);
+  }
+
+  if(!mesesData.length){
+    ['mes-kpis','mes-bar','mes-stack'].forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML='<div class="no-data">Sin datos</div>';});
+    return;
+  }
+
+  const totalIng=mesesData.reduce((s,m)=>s+m['Ingreso Neto'],0);
+  const totalUT=mesesData.reduce((s,m)=>s+m['UT Operativa'],0);
+  const bestMes=mesesData.reduce((a,b)=>b.margen>a.margen?b:a);
+  const worstMes=mesesData.reduce((a,b)=>b.margen<a.margen?b:a);
+
+  document.getElementById('mes-kpis').innerHTML=[
+    ['Ingreso período','Gs.'+fmtB(totalIng)+'B',mesesData.length+' meses'],
+    ['UT Operativa','Gs.'+fmtB(totalUT)+'B',totalIng>0?(totalUT/totalIng*100).toFixed(1)+'% margen':'—'],
+    ['Mejor mes',bestMes.mes,'Margen '+bestMes.margen+'%'],
+    ['Peor mes',worstMes.mes,'Margen '+worstMes.margen+'%'],
+  ].map(([l,v,s])=>`<div class="card-sm"><div class="kpi-label">${l}</div><div class="kpi-val" style="font-size:18px">${v}</div><div class="kpi-sub">${s}</div></div>`).join('');
+
+  document.getElementById('mes-legend').innerHTML=[
+    ['rgba(100,116,139,0.55)','Ingreso real.'],['#1d4ed8','Ingreso proy.'],
+    ['rgba(21,128,61,0.75)','UT real.'],['rgba(21,128,61,0.35)','UT proy.'],
+  ].map(([c,l])=>`<span style="display:flex;align-items:center;gap:4px"><span style="width:9px;height:9px;border-radius:2px;background:${c}"></span>${l}</span>`).join('');
+
+  const labels=mesesData.map(m=>m.mes);
+  const ingR=mesesData.map(m=>m.tipo==='Realizado'?m['Ingreso Neto']/1e6:null);
+  const ingP=mesesData.map(m=>m.tipo==='Proyectado'?m['Ingreso Neto']/1e6:null);
+  const utR=mesesData.map(m=>m.tipo==='Realizado'?m['UT Operativa']/1e6:null);
+  const utP=mesesData.map(m=>m.tipo==='Proyectado'?m['UT Operativa']/1e6:null);
+
+  if(mesBarChart) mesBarChart.destroy();
+  mesBarChart = new Chart(document.getElementById('mes-bar'),{
+    type:'bar',data:{labels,datasets:[
+      {label:'Ingreso Real.',data:ingR,backgroundColor:'rgba(100,116,139,0.5)',borderRadius:3,borderSkipped:false},
+      {label:'Ingreso Proy.',data:ingP,backgroundColor:'rgba(29,78,216,0.55)',borderRadius:3,borderSkipped:false},
+      {label:'UT Real.',data:utR,backgroundColor:'rgba(21,128,61,0.75)',borderRadius:3,borderSkipped:false},
+      {label:'UT Proy.',data:utP,backgroundColor:'rgba(21,128,61,0.35)',borderRadius:3,borderSkipped:false},
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      scales:{x:{ticks:{...TICK,autoSkip:false},grid:GRID},y:{ticks:{...TICK,callback:v=>'Gs.'+Math.round(v)+'M'},grid:GRID}},
+      plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:ctx=>` ${ctx.dataset.label}: Gs.${Math.round(ctx.raw||0).toLocaleString('es-PY')}M`}}}}
+  });
+
+  document.getElementById('mes-stack-legend').innerHTML=EG_CATS.map(c=>
+    `<span style="display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:2px;background:${EG_MAP[c]}"></span>${c.replace('Costos de ','C.').replace('Gastos del ','G.').replace('Gastos de ','G.')}</span>`
+  ).join('');
+
+  if(mesStackChart) mesStackChart.destroy();
+  mesStackChart = new Chart(document.getElementById('mes-stack'),{
+    type:'bar',data:{labels,datasets:EG_CATS.map(c=>({
+      label:c,data:mesesData.map(m=>m[c]/1e6),
+      backgroundColor:EG_MAP[c],borderWidth:0,borderSkipped:false
+    }))},
+    options:{responsive:true,maintainAspectRatio:false,
+      scales:{x:{ticks:{...TICK,autoSkip:false},grid:GRID,stacked:true},y:{ticks:{...TICK,callback:v=>'Gs.'+Math.round(v)+'M'},grid:GRID,stacked:true}},
+      plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:ctx=>` ${ctx.dataset.label}: Gs.${Math.round(ctx.raw||0).toLocaleString('es-PY')}M`}}}}
+  });
+}
+
+// ===== VIEW 3: RANKING =====
+function buildRank() {
+  const allF = getAllFiltered();
+  const ranking = RAW.sucs.map(s=>{
+    const rows = allF[s];
+    const ing=sumField(rows,'Ingreso Neto'), ut=sumField(rows,'UT Operativa');
+    return {suc:s, ing, ut, margen:ing>0?+(ut/ing*100).toFixed(1):0};
+  }).sort((a,b)=>b.margen-a.margen);
+
+  const maxM = Math.max(...ranking.map(r=>r.margen));
+  document.getElementById('rank-bars').innerHTML = ranking.map(r=>{
+    const chip=r.margen>=20?'c-ok':r.margen>=10?'c-warn':'c-bad';
+    return`<div style="margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px">
+        <span style="font-size:12px;font-weight:500">${r.suc}</span>
+        <div style="display:flex;gap:6px;align-items:center">
+          <span style="font-size:11px;color:#a8a7a3;font-family:'IBM Plex Mono'">Gs.${fmtB(r.ing)}B</span>
+          <span class="chip ${chip}">${r.margen}%</span>
+        </div>
+      </div>
+      <div class="bar-wrap" style="height:6px"><div class="bar-fill" style="width:${maxM>0?(r.margen/maxM*100).toFixed(0):0}%;background:${SUC_COLORS[r.suc]}"></div></div>
+    </div>`;
+  }).join('');
+
+  // Heatmap — always full year
+  const mH=['E','F','M','A','M','J','J','A','S','O','N','D'];
+  function hc(v){if(v===0)return'#eeecea';if(v<0)return`rgba(185,28,28,${Math.min(1,Math.abs(v)/40)})`;if(v<10)return`rgba(180,83,9,${Math.min(1,v/30)})`;if(v<20)return`rgba(2,132,199,${Math.min(1,v/30)})`;return`rgba(21,128,61,${Math.min(1,v/40)})`;}
+  function tc(v){return v===0?'#a8a7a3':Math.abs(v)>15?'#fff':'#1a1a18';}
+  let hm=`<div style="overflow-x:auto"><table style="border-collapse:collapse;width:100%"><thead><tr>
+    <th style="text-align:left;padding:3px 6px;color:#a8a7a3;font-size:10px;font-weight:500;min-width:70px">Sucursal</th>
+    ${mH.map((m,i)=>`<th style="padding:2px 2px;color:${i>=fDesde-1&&i<=fHasta-1?'#1a1a18':'#a8a7a3'};font-size:10px;font-weight:${i>=fDesde-1&&i<=fHasta-1?'600':'400'};text-align:center;min-width:26px">${m}</th>`).join('')}
+    </tr></thead><tbody>`;
+  RAW.sucs.forEach(s=>{
+    hm+=`<tr><td style="padding:3px 6px;font-size:10px;font-weight:500;white-space:nowrap">${s.split(' ')[0]}</td>`;
+    for(let m=1;m<=12;m++){
+      const row=RAW.pl_monthly[s].find(r=>r.num===m);
+      const ing=row?.['Ingreso Neto']||0, ut=row?.['UT Operativa']||0;
+      const v=ing>0?+(ut/ing*100).toFixed(0):0;
+      const inFilter=m>=fDesde&&m<=fHasta&&(fTipo==='Ambos'||row?.tipo===fTipo);
+      hm+=`<td style="padding:1px;text-align:center"><div style="background:${inFilter?hc(v):'#f5f4f0'};color:${inFilter?tc(v):'#c8c7c2'};border-radius:3px;padding:3px 1px;font-family:'IBM Plex Mono';font-size:9px;opacity:${inFilter?1:0.5}">${ing===0?'—':v+'%'}</div></td>`;
+    }
+    hm+='</tr>';
+  });
+  hm+='</tbody></table></div><div style="display:flex;gap:10px;margin-top:6px;font-size:10px;color:#a8a7a3"><span>■ Verde alto</span><span>■ Azul medio</span><span>■ Naranja bajo</span><span>■ Rojo pérdida</span></div>';
+  document.getElementById('heatmap').innerHTML=hm;
+
+  document.getElementById('alertas').innerHTML=[
+    ['al-r','Pez de Mar Dulce — 1.3% margen anual. Feb–Abr con pérdidas operativas consecutivas.'],
+    ['al-r','Pinton — acumulado realizado negativo (–Gs. 25M). Recuperación proyectada no garantizada.'],
+    ['al-r','Pétalo de Estrellas — 6 meses con ingresos en cero. Verificar datos o cierre estacional.'],
+    ['al-y','Caída sistémica Feb–Mar en todas las sucursales. Probable efecto estacional post-verano.'],
+    ['al-g','Patria sostiene el 52% de la UT del grupo con 30.2% de margen. Mejor performer.'],
+  ].map(([cls,txt])=>`<div class="alert ${cls}"><span>●</span><span>${txt}</span></div>`).join('');
+
+  const totalIng=ranking.reduce((s,r)=>s+r.ing,0);
+  document.getElementById('rank-table').innerHTML=`
+    <thead><tr><th>Sucursal</th><th>Ingreso (B)</th><th>UT Op. (M)</th><th>Margen</th><th>% grupo</th></tr></thead>
+    <tbody>${ranking.map(r=>{
+      const chip=r.margen>=20?'c-ok':r.margen>=10?'c-warn':'c-bad';
+      return`<tr>
+        <td style="font-weight:500"><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:${SUC_COLORS[r.suc]};margin-right:6px"></span>${r.suc}</td>
+        <td>${fmtB(r.ing)}</td><td class="${r.ut>=0?'pos':'neg'}">${fmt(r.ut)}</td>
+        <td><span class="chip ${chip}">${r.margen}%</span></td>
+        <td style="color:#a8a7a3">${totalIng>0?(r.ing/totalIng*100).toFixed(1)+'%':'—'}</td>
+      </tr>`;
+    }).join('')}</tbody>`;
+}
+
+// ===== VIEW 4: WATERFALL =====
+function buildWF() {
+  const allF = getAllFiltered();
+  const ing = RAW.sucs.reduce((s,suc)=>s+sumField(allF[suc],'Ingreso Neto'),0);
+  const ut  = RAW.sucs.reduce((s,suc)=>s+sumField(allF[suc],'UT Operativa'),0);
+
+  document.getElementById('wf-kpis').innerHTML=[
+    ['Ingreso Neto','Gs.'+fmtB(ing)+'B','base'],
+    ['Total Egresos','Gs.'+fmtB(ing-ut)+'B',ing>0?((ing-ut)/ing*100).toFixed(1)+'% del ingreso':'—'],
+    ['UT Operativa','Gs.'+fmtB(ut)+'B',ing>0?(ut/ing*100).toFixed(1)+'% margen':'—'],
+  ].map(([l,v,s])=>`<div class="card-sm"><div class="kpi-label">${l}</div><div class="kpi-val" style="font-size:18px">${v}</div><div class="kpi-sub">${s}</div></div>`).join('');
+
+  const wfItems=[{label:'Ingreso Neto',valor:ing,tipo:'inicio'},
+    ...EG_CATS.map(c=>({label:c.replace('Costos de ','C. ').replace('Gastos del ','G. ').replace('Gastos de ','G. '),
+      valor:-RAW.sucs.reduce((s,suc)=>s+sumField(allF[suc],c),0),tipo:'egreso'})),
+    {label:'UT Operativa',valor:ut,tipo:'resultado'}];
+
+  const labels=wfItems.map(w=>w.label);
+  const floats=[], bars=[], colors=[];
+  let running=ing;
+  wfItems.forEach((w,i)=>{
+    if(w.tipo==='inicio'){floats.push(0);bars.push(w.valor/1e6);colors.push('#1d4ed8');}
+    else if(w.tipo==='resultado'){floats.push(0);bars.push(w.valor/1e6);colors.push('#15803d');}
+    else{floats.push(running/1e6);bars.push(Math.abs(w.valor)/1e6);colors.push('#dc2626');running+=w.valor;}
+  });
+
+  if(wfChart) wfChart.destroy();
+  wfChart = new Chart(document.getElementById('wf-chart'),{
+    type:'bar',
+    data:{labels,datasets:[
+      {label:'base',data:floats,backgroundColor:'transparent',borderWidth:0,barPercentage:0.55},
+      {label:'valor',data:bars,backgroundColor:colors,borderRadius:3,borderSkipped:false,barPercentage:0.55},
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      scales:{
+        x:{ticks:{...TICK,autoSkip:false,maxRotation:30},grid:GRID},
+        y:{ticks:{...TICK,callback:v=>'Gs.'+Math.round(v).toLocaleString('es-PY')+'M'},grid:GRID,stacked:true}
+      },
+      plugins:{legend:{display:false},
+        tooltip:{...TT,filter:ctx=>ctx.datasetIndex===1,
+          callbacks:{label:ctx=>{const v=Math.abs(bars[ctx.dataIndex]);const pct=ing>0?(v*1e6/ing*100).toFixed(1):0;return` Gs.${Math.round(v).toLocaleString('es-PY')}M (${pct}%)`;}}}
+      }}
+  });
+
+  document.getElementById('wf-table').innerHTML=`
+    <thead><tr><th>Rubro</th><th>Gs. Millones</th><th>% Ingreso</th><th>Tipo</th></tr></thead>
+    <tbody>${wfItems.map(w=>{
+      const v=Math.abs(w.valor)/1e6, pct=ing>0?(Math.abs(w.valor)/ing*100).toFixed(1):0;
+      const cls=w.tipo==='inicio'?'c-blue':w.tipo==='resultado'?'c-ok':'c-bad';
+      return`<tr><td style="font-weight:${w.tipo!=='egreso'?600:400}">${w.label}</td>
+        <td class="${w.tipo==='egreso'?'neg':w.tipo==='resultado'?'pos':''}">${w.tipo==='egreso'?'(':''}${Math.round(v).toLocaleString('es-PY')}${w.tipo==='egreso'?')':''}</td>
+        <td style="color:#a8a7a3">${pct}%</td>
+        <td><span class="chip ${cls}">${w.tipo==='inicio'?'Ingreso':w.tipo==='resultado'?'Resultado':'Egreso'}</span></td>
+      </tr>`;
+    }).join('')}</tbody>`;
+}
+
+buildPL();
+</script>
+</body>
+</html>
