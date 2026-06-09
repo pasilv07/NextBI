@@ -153,13 +153,14 @@ export function sumField(rows: MonthRecord[], field: keyof Omit<MonthRecord, 'me
 
 // Global Filter Logic
 export function getFilteredData(
+  records: (MonthRecord & { sucursal: string })[],
   suc: string,
   fDesde: number,
   fHasta: number,
   fTipo: 'Ambos' | 'Realizado' | 'Proyectado'
 ): MonthRecord[] {
-  const records = RAW.pl_monthly[suc] || [];
-  return records.filter(m => {
+  const branchRecords = records.filter(r => r.sucursal === suc);
+  return branchRecords.filter(m => {
     const inRange = m.num >= fDesde && m.num <= fHasta;
     const inTipo = fTipo === 'Ambos' || m.tipo === fTipo;
     return inRange && inTipo;

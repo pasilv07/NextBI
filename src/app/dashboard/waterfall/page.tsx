@@ -1,16 +1,18 @@
 'use client';
 
 import { useFilters } from '../../../lib/useFilters';
-import { RAW, getFilteredData, sumField, fmt, fmtB, EG_CATS } from '../../../lib/data';
+import { getFilteredData, sumField, fmt, fmtB, EG_CATS } from '../../../lib/data';
 import KpiCard from '../../../components/KpiCard';
 import WaterfallChart from '../../../components/WaterfallChart';
+import { useData } from '../../../lib/DataContext';
 
 export default function WaterfallPage() {
   const { desde, hasta, tipo } = useFilters();
+  const { records, sucs } = useData();
 
   // Aggregate global values
-  const ing = RAW.sucs.reduce((sum, suc) => sum + sumField(getFilteredData(suc, desde, hasta, tipo), 'Ingreso Neto'), 0);
-  const ut = RAW.sucs.reduce((sum, suc) => sum + sumField(getFilteredData(suc, desde, hasta, tipo), 'UT Operativa'), 0);
+  const ing = sucs.reduce((sum, suc) => sum + sumField(getFilteredData(records, suc, desde, hasta, tipo), 'Ingreso Neto'), 0);
+  const ut = sucs.reduce((sum, suc) => sum + sumField(getFilteredData(records, suc, desde, hasta, tipo), 'UT Operativa'), 0);
   const totalEg = ing - ut;
   const egPercentage = ing > 0 ? ((totalEg / ing) * 100).toFixed(1) : '0';
   const margin = ing > 0 ? ((ut / ing) * 100).toFixed(1) : '0';
@@ -22,7 +24,7 @@ export default function WaterfallPage() {
     { label: 'Ingreso Neto', valor: ing, tipo: 'inicio' as const },
     ...EG_CATS.map(cat => ({
       label: cat.replace('Costos de ', 'C. ').replace('Gastos del ', 'G. ').replace('Gastos de ', 'G. '),
-      valor: -RAW.sucs.reduce((sum, suc) => sum + sumField(getFilteredData(suc, desde, hasta, tipo), cat), 0),
+      valor: -sucs.reduce((sum, suc) => sum + sumField(getFilteredData(records, suc, desde, hasta, tipo), cat), 0),
       tipo: 'egreso' as const
     })),
     { label: 'UT Operativa', valor: ut, tipo: 'resultado' as const }

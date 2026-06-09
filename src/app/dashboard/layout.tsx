@@ -1,5 +1,6 @@
 import { Suspense } from 'react';
 import DashboardLayoutContent from '../../components/DashboardLayoutContent';
+import { DataProvider } from '../../lib/DataContext';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -16,7 +17,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         Cargando Dashboard de Control...
       </div>
     }>
-      <DashboardLayoutContent>{children}</DashboardLayoutContent>
+      <DataProvider>
+        <DashboardLayoutContent>{children}</DashboardLayoutContent>
+      </DataProvider>
     </Suspense>
   );
 }

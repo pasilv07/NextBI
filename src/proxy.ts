@@ -1,35 +1,53 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { verifyJWT } from './lib/auth';
+import { createServerClient } from '@supabase/ssr';
 
 export async function proxy(request: NextRequest) {
-  const { pathname } = request.nextUrl;
-  const token = request.cookies.get('auth_token')?.value;
+  let response = NextResponse.next({
+    request: {
+      headers: request.headers,
+    },
+  });
 
-  // Define route checkers
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return request.cookies.getAll();
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
+          response = NextResponse.next({
+            request: {
+              headers: request.headers,
+            },
+          });
+          cookiesToSet.forEach(({ name, value, options }) =>
+            response.cookies.set(name, value, options)
+          );
+        },
+      },
+    }
+  );
+
+  const { data: { user } } = await supabase.auth.getUser();
+  const { pathname } = request.nextUrl;
+
   const isDashboardRoute = pathname.startsWith('/dashboard');
   const isLoginRoute = pathname === '/login';
   const isRootRoute = pathname === '/';
 
-  // Verify the JWT token
-  let session = null;
-  if (token) {
-    session = await verifyJWT(token);
-  }
-
   // 1. If trying to access dashboard but not authenticated
-  if (isDashboardRoute && !session) {
+  if (isDashboardRoute && !user) {
     const loginUrl = new URL('/login', request.url);
     loginUrl.searchParams.set('redirect', pathname);
-    
-    // Clear cookie just in case it was invalid/expired
-    const response = NextResponse.redirect(loginUrl);
-    response.cookies.delete('auth_token');
-    return response;
+    return NextResponse.redirect(loginUrl);
   }
 
   // 2. If trying to access login page but already logged in
-  if (isLoginRoute && session) {
+  if (isLoginRoute && user) {
     return NextResponse.redirect(new URL('/dashboard', request.url));
   }
 
@@ -38,7 +56,7 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL('/dashboard', request.url));
   }
 
-  return NextResponse.next();
+  return response;
 }
 
 // Config to specify matching paths

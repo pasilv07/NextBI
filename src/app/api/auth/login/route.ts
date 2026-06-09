@@ -1,46 +1,31 @@
 import { NextResponse } from 'next/server';
-import { signJWT } from '../../../../lib/auth';
-
-const MOCK_USERS = [
-  { email: 'admin@walter.com.py', password: 'admin123', name: 'Admin Walter S.A.', role: 'Administrador' },
-  { email: 'analista@walter.com.py', password: 'analista123', name: 'Analista BI', role: 'Analista' }
-];
+import { createClient } from '../../../../lib/supabase/server';
 
 export async function POST(request: Request) {
   try {
     const { email, password } = await request.json();
 
-    const user = MOCK_USERS.find(u => u.email === email.toLowerCase().trim() && u.password === password);
+    const supabase = await createClient();
 
-    if (!user) {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: email.toLowerCase().trim(),
+      password,
+    });
+
+    if (error) {
       return NextResponse.json(
-        { error: 'Credenciales inválidas. Intente con admin@walter.com.py / admin123' },
+        { error: 'Credenciales inválidas. Intente de nuevo.' },
         { status: 401 }
       );
     }
 
     const sessionPayload = {
-      email: user.email,
-      name: user.name,
-      role: user.role
+      email: data.user.email,
+      name: data.user.user_metadata?.name || data.user.email?.split('@')[0] || 'Usuario',
+      role: data.user.user_metadata?.role || 'Analista'
     };
 
-    const token = await signJWT(sessionPayload);
-
-    // Create the response and set the httpOnly cookie
-    const response = NextResponse.json({ success: true, user: sessionPayload });
-    
-    response.cookies.set({
-      name: 'auth_token',
-      value: token,
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      path: '/',
-      maxAge: 60 * 60 * 24 // 1 day
-    });
-
-    return response;
+    return NextResponse.json({ success: true, user: sessionPayload });
   } catch (error) {
     console.error('Login error:', error);
     return NextResponse.json({ error: 'Error interno del servidor' }, { status: 500 });

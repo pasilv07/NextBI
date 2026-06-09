@@ -1,7 +1,8 @@
 'use client';
 
 import { useFilters } from '../../../lib/useFilters';
-import { RAW, getFilteredData, sumField, fmt, fmtB, SUC_COLORS } from '../../../lib/data';
+import { getFilteredData, sumField, fmt, fmtB, SUC_COLORS } from '../../../lib/data';
+import { useData } from '../../../lib/DataContext';
 
 interface BranchRanking {
   suc: string;
@@ -12,10 +13,11 @@ interface BranchRanking {
 
 export default function RankingPage() {
   const { desde, hasta, tipo } = useFilters();
+  const { records, sucs } = useData();
 
   // Compute stats for each branch
-  const ranking: BranchRanking[] = RAW.sucs.map(suc => {
-    const rows = getFilteredData(suc, desde, hasta, tipo);
+  const ranking: BranchRanking[] = sucs.map(suc => {
+    const rows = getFilteredData(records, suc, desde, hasta, tipo);
     const ing = sumField(rows, 'Ingreso Neto');
     const ut = sumField(rows, 'UT Operativa');
     const margen = ing > 0 ? (ut / ing) * 100 : 0;
@@ -124,7 +126,7 @@ export default function RankingPage() {
                 </tr>
               </thead>
               <tbody>
-                {RAW.sucs.map(s => {
+                {sucs.map(s => {
                   return (
                     <tr key={s}>
                       <td style={{ padding: '4px 6px', fontSize: '10px', fontWeight: 500, whiteSpace: 'nowrap' }}>
@@ -132,7 +134,7 @@ export default function RankingPage() {
                       </td>
                       {Array.from({ length: 12 }).map((_, mIdx) => {
                         const mNum = mIdx + 1;
-                        const row = RAW.pl_monthly[s].find(r => r.num === mNum);
+                        const row = records.find(r => r.sucursal === s && r.num === mNum);
                         const ing = row?.['Ingreso Neto'] || 0;
                         const ut = row?.['UT Operativa'] || 0;
                         const marginVal = ing > 0 ? Math.round((ut / ing) * 100) : 0;

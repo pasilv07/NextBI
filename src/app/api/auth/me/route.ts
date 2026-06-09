@@ -1,23 +1,22 @@
 import { NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
-import { verifyJWT } from '../../../../lib/auth';
+import { createClient } from '../../../../lib/supabase/server';
 
 export async function GET() {
   try {
-    const cookieStore = await cookies();
-    const token = cookieStore.get('auth_token')?.value;
+    const supabase = await createClient();
+    const { data: { user }, error } = await supabase.auth.getUser();
 
-    if (!token) {
+    if (error || !user) {
       return NextResponse.json({ error: 'No autenticado' }, { status: 401 });
     }
 
-    const session = await verifyJWT(token);
+    const sessionPayload = {
+      email: user.email,
+      name: user.user_metadata?.name || user.email?.split('@')[0] || 'Usuario',
+      role: user.user_metadata?.role || 'Analista'
+    };
 
-    if (!session) {
-      return NextResponse.json({ error: 'Sesión inválida o expirada' }, { status: 401 });
-    }
-
-    return NextResponse.json({ user: session });
+    return NextResponse.json({ user: sessionPayload });
   } catch (error) {
     console.error('Session retrieval error:', error);
     return NextResponse.json({ error: 'Error interno' }, { status: 500 });

@@ -1,14 +1,16 @@
 'use client';
 
 import { useFilters } from '../../lib/useFilters';
-import { RAW, getFilteredData, sumField, fmt, fmtB, EG_CATS, EG_COLORS } from '../../lib/data';
+import { getFilteredData, sumField, fmt, fmtB, EG_CATS, EG_COLORS } from '../../lib/data';
 import KpiCard from '../../components/KpiCard';
 import ChartDonut from '../../components/ChartDonut';
+import { useData } from '../../lib/DataContext';
 
 export default function PLBranchPage() {
   const { desde, hasta, tipo, sucursal, setFilter } = useFilters();
+  const { records, sucs } = useData();
 
-  const rows = getFilteredData(sucursal, desde, hasta, tipo);
+  const rows = getFilteredData(records, sucursal, desde, hasta, tipo);
   const totalMonths = rows.length;
 
   // Calculate totals
@@ -29,7 +31,7 @@ export default function PLBranchPage() {
     <div>
       {/* Branch selector buttons */}
       <div className="suc-sel">
-        {RAW.sucs.map(s => (
+        {sucs.map(s => (
           <button
             key={s}
             className={`suc-btn ${s === sucursal ? 'active' : ''}`}

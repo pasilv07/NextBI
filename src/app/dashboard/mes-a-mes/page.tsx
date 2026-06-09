@@ -1,10 +1,11 @@
 'use client';
 
 import { useFilters } from '../../../lib/useFilters';
-import { RAW, MESES_LABEL, EG_CATS, EG_MAP, fmtB } from '../../../lib/data';
+import { MESES_LABEL, EG_CATS, EG_MAP, fmtB } from '../../../lib/data';
 import KpiCard from '../../../components/KpiCard';
 import ChartMonthlyBar from '../../../components/ChartMonthlyBar';
 import ChartStackedBar from '../../../components/ChartStackedBar';
+import { useData } from '../../../lib/DataContext';
 
 interface CompiledMonth {
   mes: string;
@@ -17,20 +18,21 @@ interface CompiledMonth {
 
 export default function MesAMesPage() {
   const { desde, hasta, tipo } = useFilters();
+  const { records, sucs } = useData();
 
   // Compile monthly values aggregated across all branches
   const monthlyData: CompiledMonth[] = [];
 
   for (let m = desde; m <= hasta; m++) {
-    // Determine month type (using La Provista as reference since type mapping is identical for all branches)
-    const refRow = RAW.pl_monthly['La Provista'].find(r => r.num === m);
+    // Determine month type (using first found record as reference since type mapping is identical for all branches)
+    const refRow = records.find(r => r.num === m);
     if (!refRow) continue;
     if (tipo !== 'Ambos' && refRow.tipo !== tipo) continue;
 
     // Aggregate values for all branches
-    const monthBranchesRows = RAW.sucs
-      .map(suc => RAW.pl_monthly[suc].find(r => r.num === m))
-      .filter(Boolean);
+    const monthBranchesRows = sucs
+      .map(suc => records.find(r => r.sucursal === suc && r.num === m))
+      .filter((r): r is typeof records[0] => !!r);
 
     const entry: CompiledMonth = {
       mes: MESES_LABEL[m - 1],
