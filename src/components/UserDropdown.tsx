@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { LogOut, ChevronDown, User } from 'lucide-react';
+import Link from 'next/link';
 
 interface UserSession {
   name: string;
@@ -26,7 +27,7 @@ export default function UserDropdown() {
       })
       .catch(() => {
         // Safe fallback if fetch fails
-        setUser({ name: 'Usuario', email: '', role: 'Usuario' });
+        setUser({ name: 'Invitado', email: '', role: 'Visor' });
       });
 
     // Click outside handler to close dropdown
@@ -74,13 +75,27 @@ export default function UserDropdown() {
 
       {isOpen && (
         <div className="profile-dropdown">
-          <div style={{ padding: '8px 12px', borderBottom: '1px solid var(--border)', fontSize: '11px', color: 'var(--text-muted)' }}>
-            Conectado como <strong style={{ color: 'var(--text)' }}>{user.email}</strong>
-          </div>
-          <button className="dropdown-item" onClick={handleLogout} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 12px', color: 'var(--red)' }}>
-            <LogOut size={12} />
-            Cerrar sesión
-          </button>
+          {user.email ? (
+            <>
+              <div style={{ padding: '8px 12px', borderBottom: '1px solid var(--border)', fontSize: '11px', color: 'var(--text-muted)' }}>
+                Conectado como <strong style={{ color: 'var(--text)' }}>{user.email}</strong>
+              </div>
+              <button className="dropdown-item" onClick={handleLogout} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 12px', color: 'var(--red)', width: '100%', border: 'none', background: 'transparent', cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left' }}>
+                <LogOut size={12} />
+                Cerrar sesión
+              </button>
+            </>
+          ) : (
+            <>
+              <div style={{ padding: '8px 12px', borderBottom: '1px solid var(--border)', fontSize: '11px', color: 'var(--text-muted)' }}>
+                Acceso público
+              </div>
+              <Link href="/login" className="dropdown-item" style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 12px', color: 'var(--blue)', textDecoration: 'none', fontSize: '12px' }}>
+                <User size={12} />
+                Iniciar sesión
+              </Link>
+            </>
+          )}
         </div>
       )}
     </div>
