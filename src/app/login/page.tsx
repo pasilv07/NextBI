@@ -11,19 +11,16 @@ function LoginForm() {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = async (e?: React.FormEvent, customEmail?: string, customPassword?: string) => {
-    if (e) e.preventDefault();
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
     setError(null);
     setIsLoading(true);
-
-    const finalEmail = customEmail || email;
-    const finalPassword = customPassword || password;
 
     try {
       const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: finalEmail, password: finalPassword })
+        body: JSON.stringify({ email, password })
       });
 
       const data = await res.json();
@@ -42,16 +39,8 @@ function LoginForm() {
     }
   };
 
-  const handleQuickLogin = (role: 'admin' | 'analista') => {
-    const qEmail = role === 'admin' ? 'admin@walter.com.py' : 'analista@walter.com.py';
-    const qPassword = role === 'admin' ? 'admin123' : 'analista123';
-    setEmail(qEmail);
-    setPassword(qPassword);
-    handleSubmit(undefined, qEmail, qPassword);
-  };
-
   return (
-    <form onSubmit={(e) => handleSubmit(e)} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+    <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
       {error && (
         <div className="alert al-r" style={{ marginBottom: '8px' }}>
           <span>●</span>
@@ -94,57 +83,6 @@ function LoginForm() {
       >
         {isLoading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
       </button>
-
-      <div style={{ marginTop: '16px', borderTop: '1px solid var(--border)', paddingTop: '16px' }}>
-        <label className="form-label" style={{ display: 'block', marginBottom: '8px', textAlign: 'center' }}>
-          Acceso Rápido (Demostración)
-        </label>
-        <div style={{ display: 'flex', gap: '8px' }}>
-          <button
-            type="button"
-            onClick={() => handleQuickLogin('admin')}
-            disabled={isLoading}
-            style={{
-              flex: 1,
-              padding: '10px 8px',
-              borderRadius: 'var(--radius-sm)',
-              border: '1px solid var(--border)',
-              background: 'rgba(255, 255, 255, 0.8)',
-              color: 'var(--text)',
-              fontSize: '11px',
-              fontWeight: '600',
-              cursor: 'pointer',
-              fontFamily: 'inherit',
-              transition: 'var(--transition)',
-              textAlign: 'center'
-            }}
-          >
-            Administrador
-          </button>
-          
-          <button
-            type="button"
-            onClick={() => handleQuickLogin('analista')}
-            disabled={isLoading}
-            style={{
-              flex: 1,
-              padding: '10px 8px',
-              borderRadius: 'var(--radius-sm)',
-              border: '1px solid var(--border)',
-              background: 'rgba(255, 255, 255, 0.8)',
-              color: 'var(--text)',
-              fontSize: '11px',
-              fontWeight: '600',
-              cursor: 'pointer',
-              fontFamily: 'inherit',
-              transition: 'var(--transition)',
-              textAlign: 'center'
-            }}
-          >
-            Analista
-          </button>
-        </div>
-      </div>
     </form>
   );
 }
