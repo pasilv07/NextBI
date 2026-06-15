@@ -6,23 +6,24 @@ import { useRouter, useSearchParams } from 'next/navigation';
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [selectedRole, setSelectedRole] = useState<'admin' | 'analista'>('admin');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (e?: React.FormEvent, customEmail?: string, customPassword?: string) => {
+    if (e) e.preventDefault();
     setError(null);
     setIsLoading(true);
 
-    const email = selectedRole === 'admin' ? 'admin@walter.com.py' : 'analista@walter.com.py';
-    const password = selectedRole === 'admin' ? 'admin123' : 'analista123';
+    const finalEmail = customEmail || email;
+    const finalPassword = customPassword || password;
 
     try {
       const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
+        body: JSON.stringify({ email: finalEmail, password: finalPassword })
       });
 
       const data = await res.json();
@@ -41,76 +42,108 @@ function LoginForm() {
     }
   };
 
+  const handleQuickLogin = (role: 'admin' | 'analista') => {
+    const qEmail = role === 'admin' ? 'admin@walter.com.py' : 'analista@walter.com.py';
+    const qPassword = role === 'admin' ? 'admin123' : 'analista123';
+    setEmail(qEmail);
+    setPassword(qPassword);
+    handleSubmit(undefined, qEmail, qPassword);
+  };
+
   return (
-    <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+    <form onSubmit={(e) => handleSubmit(e)} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
       {error && (
-        <div className="alert al-r" style={{ marginBottom: '16px' }}>
+        <div className="alert al-r" style={{ marginBottom: '8px' }}>
           <span>●</span>
           <span>{error}</span>
         </div>
       )}
 
       <div className="form-group">
-        <label className="form-label">Seleccionar Perfil</label>
-        
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '4px' }}>
-          <button
-            type="button"
-            onClick={() => setSelectedRole('admin')}
-            style={{
-              padding: '12px 16px',
-              borderRadius: 'var(--radius-md)',
-              border: selectedRole === 'admin' ? '2px solid var(--text)' : '1px solid var(--border)',
-              background: selectedRole === 'admin' ? 'var(--blue-bg)' : 'rgba(255, 255, 255, 0.8)',
-              color: 'var(--text)',
-              textAlign: 'left',
-              cursor: 'pointer',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '2px',
-              fontFamily: 'inherit',
-              transition: 'var(--transition)'
-            }}
-          >
-            <strong style={{ fontSize: '13px' }}>Administrador</strong>
-            <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>admin@walter.com.py (Acceso Total)</span>
-          </button>
+        <label className="form-label" htmlFor="email">Usuario / Correo</label>
+        <input
+          id="email"
+          type="email"
+          className="form-input"
+          placeholder="correo@ejemplo.com"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          disabled={isLoading}
+        />
+      </div>
 
-          <button
-            type="button"
-            onClick={() => setSelectedRole('analista')}
-            style={{
-              padding: '12px 16px',
-              borderRadius: 'var(--radius-md)',
-              border: selectedRole === 'analista' ? '2px solid var(--text)' : '1px solid var(--border)',
-              background: selectedRole === 'analista' ? 'var(--blue-bg)' : 'rgba(255, 255, 255, 0.8)',
-              color: 'var(--text)',
-              textAlign: 'left',
-              cursor: 'pointer',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '2px',
-              fontFamily: 'inherit',
-              transition: 'var(--transition)'
-            }}
-          >
-            <strong style={{ fontSize: '13px' }}>Analista</strong>
-            <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>analista@walter.com.py (Vista y Consultas)</span>
-          </button>
-        </div>
+      <div className="form-group" style={{ marginBottom: '8px' }}>
+        <label className="form-label" htmlFor="password">Contraseña</label>
+        <input
+          id="password"
+          type="password"
+          className="form-input"
+          placeholder="••••••••"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+          disabled={isLoading}
+        />
       </div>
 
       <button
         type="submit"
         className="btn-primary"
         disabled={isLoading}
-        style={{ marginTop: '8px' }}
       >
-        {isLoading ? 'Iniciando sesión...' : `Iniciar Sesión como ${selectedRole === 'admin' ? 'Administrador' : 'Analista'}`}
+        {isLoading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
       </button>
 
-      <div style={{ marginTop: '8px', fontSize: '11px', color: 'var(--text-secondary)', textAlign: 'center' }}>
-        Las credenciales de Supabase se validan de forma automática en el servidor.
+      <div style={{ marginTop: '16px', borderTop: '1px solid var(--border)', paddingTop: '16px' }}>
+        <label className="form-label" style={{ display: 'block', marginBottom: '8px', textAlign: 'center' }}>
+          Acceso Rápido (Demostración)
+        </label>
+        <div style={{ display: 'flex', gap: '8px' }}>
+          <button
+            type="button"
+            onClick={() => handleQuickLogin('admin')}
+            disabled={isLoading}
+            style={{
+              flex: 1,
+              padding: '10px 8px',
+              borderRadius: 'var(--radius-sm)',
+              border: '1px solid var(--border)',
+              background: 'rgba(255, 255, 255, 0.8)',
+              color: 'var(--text)',
+              fontSize: '11px',
+              fontWeight: '600',
+              cursor: 'pointer',
+              fontFamily: 'inherit',
+              transition: 'var(--transition)',
+              textAlign: 'center'
+            }}
+          >
+            Administrador
+          </button>
+          
+          <button
+            type="button"
+            onClick={() => handleQuickLogin('analista')}
+            disabled={isLoading}
+            style={{
+              flex: 1,
+              padding: '10px 8px',
+              borderRadius: 'var(--radius-sm)',
+              border: '1px solid var(--border)',
+              background: 'rgba(255, 255, 255, 0.8)',
+              color: 'var(--text)',
+              fontSize: '11px',
+              fontWeight: '600',
+              cursor: 'pointer',
+              fontFamily: 'inherit',
+              transition: 'var(--transition)',
+              textAlign: 'center'
+            }}
+          >
+            Analista
+          </button>
+        </div>
       </div>
     </form>
   );
